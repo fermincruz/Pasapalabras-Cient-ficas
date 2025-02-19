@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Configuración y Juego</title>
+  <!-- Se incluye Font Awesome para los iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ==================== ESTILOS COMUNES ==================== */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .bg {
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    }
+
+    /* ==================== PÁGINA DE CONFIGURACIÓN ==================== */
+    #config-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #config-page form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    #config-page h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #config-page label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+
+    #config-page input,
+    #config-page select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    #config-page button {
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #config-page button:hover {
+      background-color: #219150;
+    }
+
+    #team-names-container input {
+      margin-bottom: 10px;
+    }
+
+    /* ==================== PÁGINA DEL JUEGO ==================== */
+    #game-page {
+      display: none;
+    }
+
+    .game-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .left-container {
+      width: 30%;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .timer-section {
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 16vw;
+      color: #2ecc71;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      transition: color 0.5s ease;
+      white-space: nowrap;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .warning {
+      color: #e74c3c;
+      animation: pulse 1s infinite;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .controls button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    .start-btn {
+      background-color: #27ae60;
+    }
+
+    .start-btn:hover {
+      background-color: #219150;
+    }
+
+    .reset-btn {
+      background-color: #c0392b;
+    }
+
+    .reset-btn:hover {
+      background-color: #a83224;
+    }
+
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Indicador de equipo (turno o edición de puntuación) */
+    #current-team-indicator {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* Animación para remarcar cuando todos contestan */
+    @keyframes zoomPulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .all-turn {
+      font-size: 2.5em;
+      animation: zoomPulse 1s infinite;
+    }
+
+    .teams-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .team-card {
+      padding: 10px;
+      border: 3px solid #333;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .team-card h2 {
+      margin: 10px 0;
+      font-size: 24px;
+    }
+
+    .score {
+      font-size: 48px;
+      margin: 10px 0;
+    }
+
+    .score-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .score-controls button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .score-add {
+      background-color: #27ae60;
+      color: #fff;
+    }
+
+    .score-add:hover {
+      background-color: #219150;
+    }
+
+    .score-subtract {
+      background-color: #c0392b;
+      color: #fff;
+    }
+
+    .score-subtract:hover {
+      background-color: #a83224;
+    }
+
+    .right-container {
+      width: 70%;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+      background: #fff;
+      position: relative;
+    }
+
+    .pdf-viewer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    #pdf-canvas {
+      width: 100%;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .pdf-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pdf-controls button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* ==================== ESTILOS DEL MENSAJE GANADOR ==================== */
+    #winning-message {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(45deg, #ff416c, #ff4b2b, #ff416c, #ff4b2b);
+      background-size: 400% 400%;
+      color: #fff;
+      font-size: 4em;
+      font-weight: bold;
+      padding: 20px;
+      box-sizing: border-box;
+      border-radius: 15px;
+      /* Animaciones combinadas: pop in, fondo animado y resplandor en el texto */
+      animation: popIn 1s ease-out forwards, gradientShift 8s ease infinite, textGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+
+      80% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes textGlow {
+      0% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6);
+      }
+
+      50% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.8);
+      }
+
+      100% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg">
+  <!-- PÁGINA DE CONFIGURACIÓN -->
+  <div id="config-page" class="bg">
+    <form id="config-form">
+      <h1>Configuración del Juego</h1>
+      <label for="config-time">Tiempo para cada pregunta (segundos):</label>
+      <input type="number" id="config-time" min="1" value="30" required>
+
+      <label for="config-num-teams">Número de equipos:</label>
+      <select id="config-num-teams" required>
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+
+      <div id="team-names-container">
+        <!-- Se generarán aquí los inputs para los nombres de los equipos -->
+      </div>
+
+      <button type="submit">Comenzar Juego</button>
+    </form>
+  </div>
+
+  <!-- PÁGINA DEL JUEGO -->
+  <div id="game-page" class="bg">
+    <div class="game-container">
+      <!-- Izquierda: Temporizador, indicador y marcadores -->
+      <div class="left-container">
+        <div class="timer-section">
+          <div class="timer" id="timer">30</div>
+          <div class="controls">
+            <button class="start-btn" id="startButton" title="Comenzar">
+              <i class="fas fa-play"></i>
+            </button>
+            <button class="reset-btn" id="resetButton" title="Reset">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+          <div id="current-team-indicator"></div>
+        </div>
+        <div id="teams-container" class="teams-grid"></div>
+      </div>
+      <!-- Derecha: Visor de PDF -->
+      <div class="right-container">
+        <div class="pdf-viewer">
+          <canvas id="pdf-canvas"></canvas>
+          <div class="pdf-controls">
+            <button id="prev">Anterior</button>
+            <span>Página <span id="page_num"></span> / <span id="page_count"></span></span>
+            <button id="next">Siguiente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    /********************* CONFIGURACIÓN *********************/
+    const configForm = document.getElementById('config-form');
+    const numTeamsSelect = document.getElementById('config-num-teams');
+    const teamNamesContainer = document.getElementById('team-names-container');
+
+    function generateTeamInputs(num) {
+      teamNamesContainer.innerHTML = '';
+      for (let i = 1; i <= num; i++) {
+        const label = document.createElement('label');
+        label.textContent = `Nombre del Equipo ${i}:`;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `team-name-${i}`;
+        input.placeholder = `Equipo ${i}`;
+        input.required = true;
+        teamNamesContainer.appendChild(label);
+        teamNamesContainer.appendChild(input);
+      }
+    }
+    generateTeamInputs(numTeamsSelect.value);
+    numTeamsSelect.addEventListener('change', (e) => {
+      generateTeamInputs(e.target.value);
+    });
+
+    let configTime = 30;
+    let configTeams = [];
+
+    configForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      configTime = parseInt(document.getElementById('config-time').value, 10);
+      const numTeams = parseInt(numTeamsSelect.value, 10);
+      configTeams = [];
+      for (let i = 1; i <= numTeams; i++) {
+        const name = document.getElementById(`team-name-${i}`).value.trim();
+        configTeams.push(name || `Equipo ${i}`);
+      }
+      document.getElementById('config-page').style.display = 'none';
+      document.getElementById('game-page').style.display = 'block';
+      initGame();
+      updateGameState();
+      setTimeout(() => {
+        renderPage(pageNum);
+      }, 100);
+    });
+
+    /********************* JUEGO *********************/
+    let tiempoInicial = configTime;
+    let tiempoRestante = tiempoInicial;
+    const timerElemento = document.getElementById('timer');
+    const startButton = document.getElementById('startButton');
+    const resetButton = document.getElementById('resetButton');
+
+    let scores = [];
+
+    function initGame() {
+      tiempoInicial = configTime;
+      tiempoRestante = tiempoInicial;
+      actualizarTemporizador();
+      scores = configTeams.map(() => 0);
+      const teamsContainer = document.getElementById('teams-container');
+      teamsContainer.innerHTML = '';
+      configTeams.forEach((teamName, index) => {
+        const colors = ["#3498db", "#e74c3c", "#2ecc71", "#f1c40f", "#9b59b6", "#e67e22", "#1abc9c", "#34495e"];
+        const teamColor = colors[index % colors.length];
+        const teamCard = document.createElement('div');
+        teamCard.className = 'team-card';
+        teamCard.style.borderColor = teamColor;
+        teamCard.innerHTML = `
+          <h2>${teamName}</h2>
+          <div class="score" id="score-${index}">0</div>
+          <div class="score-controls">
+            <button class="score-add disabled" data-team="${index}" disabled>+</button>
+            <button class="score-subtract disabled" data-team="${index}" disabled>−</button>
+          </div>
+        `;
+        teamsContainer.appendChild(teamCard);
+      });
+
+      document.querySelectorAll('.score-add').forEach(button => {
+        button.addEventListener('click', () => {
+          const teamIndex = button.dataset.team;
+          scores[teamIndex]++;
+          actualizarMarcador(teamIndex);
+        });
+      });
+      document.querySelectorAll('.score-subtract').forEach(button => {
+        button.addEventListener('click', () => {
+          const teamIndex = button.dataset.team;
+          scores[teamIndex]--;
+          actualizarMarcador(teamIndex);
+        });
+      });
+    }
+
+    function actualizarMarcador(teamIndex) {
+      document.getElementById(`score-${teamIndex}`).textContent = scores[teamIndex];
+    }
+
+    function disableAllScoreControls() {
+      document.querySelectorAll('.score-add, .score-subtract').forEach(button => {
+        button.disabled = true;
+        button.classList.add('disabled');
+      });
+    }
+    function enableScoreControlsForTeam(teamIndex) {
+      document.querySelectorAll(`.score-add[data-team="${teamIndex}"], .score-subtract[data-team="${teamIndex}"]`)
+        .forEach(button => {
+          button.disabled = false;
+          button.classList.remove('disabled');
+        });
+    }
+
+    let audioCtx = null;
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playBeep() {
+      initAudioContext();
+      const oscillator = audioCtx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    }
+    function playHorn() {
+      initAudioContext();
+      const oscillator = audioCtx.createOscillator();
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    }
+
+    let cuentaAtrasInterval = null;
+    function actualizarTemporizador() {
+      timerElemento.textContent = tiempoRestante;
+      if (tiempoRestante <= 10 && tiempoRestante > 0) {
+        timerElemento.classList.add('warning');
+      } else {
+        timerElemento.classList.remove('warning');
+      }
+    }
+    function iniciarCuentaAtras() {
+      if (cuentaAtrasInterval !== null) return;
+      tiempoRestante = tiempoInicial;
+      actualizarTemporizador();
+      cuentaAtrasInterval = setInterval(() => {
+        tiempoRestante--;
+        actualizarTemporizador();
+        if (tiempoRestante <= 10 && tiempoRestante > 0) {
+          playBeep();
+        }
+        if (tiempoRestante <= 0) {
+          clearInterval(cuentaAtrasInterval);
+          cuentaAtrasInterval = null;
+          playHorn();
+        }
+      }, 1000);
+    }
+    function resetearTemporizador() {
+      if (cuentaAtrasInterval !== null) {
+        clearInterval(cuentaAtrasInterval);
+        cuentaAtrasInterval = null;
+      }
+      tiempoRestante = tiempoInicial;
+      actualizarTemporizador();
+    }
+    startButton.addEventListener('click', iniciarCuentaAtras);
+    resetButton.addEventListener('click', resetearTemporizador);
+
+    /********************* CONTROL DEL ESTADO DEL JUEGO *********************/
+    function updateGameState() {
+      const currentIndicator = document.getElementById("current-team-indicator");
+
+      if (pageNum === 1) {
+        resetearTemporizador();
+        disableAllScoreControls();
+        currentIndicator.textContent = "Presentación";
+        currentIndicator.classList.remove("all-turn");
+        return;
+      }
+
+      let questionNumber;
+      if (pageNum % 2 === 0) {
+        questionNumber = Math.floor((pageNum - 2) / 2) + 1;
+      } else {
+        questionNumber = Math.floor((pageNum - 3) / 2) + 1;
+      }
+
+      const TOTAL_QUESTIONS = 26;
+      const numTeams = configTeams.length;
+      const baseQuestions = Math.floor(TOTAL_QUESTIONS / numTeams);
+      const threshold = baseQuestions * numTeams;
+
+      if (questionNumber > threshold) {
+        if (pageNum % 2 === 0) {
+          disableAllScoreControls();
+          iniciarCuentaAtras();
+          currentIndicator.textContent = "Turno: ¡Todos contestan!";
+          currentIndicator.classList.add("all-turn");
+        } else {
+          resetearTemporizador();
+          disableAllScoreControls();
+          for (let i = 0; i < numTeams; i++) {
+            enableScoreControlsForTeam(i);
+          }
+          currentIndicator.textContent = "Editar puntuación: ¡Todos contestan!";
+          currentIndicator.classList.add("all-turn");
+        }
+      } else {
+        let teamIndex = (questionNumber - 1) % numTeams;
+        currentIndicator.classList.remove("all-turn");
+        if (pageNum % 2 === 0) {
+          disableAllScoreControls();
+          iniciarCuentaAtras();
+          currentIndicator.textContent = "Turno: " + configTeams[teamIndex];
+        } else {
+          resetearTemporizador();
+          disableAllScoreControls();
+          enableScoreControlsForTeam(teamIndex);
+          currentIndicator.textContent = "Editar puntuación: " + configTeams[teamIndex];
+        }
+      }
+    }
+
+    /******************* PDF VIEWER (con PDF.js) *******************/
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    let pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      canvas = document.getElementById('pdf-canvas'),
+      ctx = canvas.getContext('2d');
+
+    function renderPage(num) {
+      pageRendering = true;
+      pdfDoc.getPage(num).then(function (page) {
+        const pdfContainer = document.querySelector('.right-container');
+        const desiredWidth = pdfContainer.clientWidth;
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const scaleFactor = desiredWidth / unscaledViewport.width;
+        const viewport = page.getViewport({ scale: scaleFactor });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        const renderTask = page.render(renderContext);
+        renderTask.promise.then(function () {
+          pageRendering = false;
+          if (pageNumPending !== null) {
+            renderPage(pageNumPending);
+            pageNumPending = null;
+          }
+          updateGameState();
+        });
+      });
+      document.getElementById('page_num').textContent = num;
+    }
+    function queueRenderPage(num) {
+      if (pageRendering) {
+        pageNumPending = num;
+      } else {
+        renderPage(num);
+      }
+    }
+    function onPrevPage() {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+      updateGameState();
+    }
+    document.getElementById('prev').addEventListener('click', onPrevPage);
+    function onNextPage() {
+      // Si se llega al final del PDF, mostrar mensaje ganador
+      if (pageNum >= pdfDoc.numPages) {
+        showWinningMessage();
+        return;
+      }
+      pageNum++;
+      queueRenderPage(pageNum);
+      updateGameState();
+    }
+    document.getElementById('next').addEventListener('click', onNextPage);
+
+    function showWinningMessage() {
+      // Calcular puntaje máximo y determinar ganador(es)
+      let maxScore = Math.max(...scores);
+      let winners = [];
+      for (let i = 0; i < scores.length; i++) {
+        if (scores[i] === maxScore) {
+          winners.push(configTeams[i]);
+        }
+      }
+      let message = "";
+      if (winners.length === 1) {
+        message = `¡Gana ${winners[0]}!`;
+      } else {
+        message = `¡Empate entre ${winners.join(", ")}!`;
+      }
+      // Reemplazar el contenido del visor PDF por el mensaje ganador
+      const pdfViewer = document.querySelector('.pdf-viewer');
+      pdfViewer.innerHTML = "";
+      const winMsgDiv = document.createElement("div");
+      winMsgDiv.id = "winning-message";
+      winMsgDiv.innerHTML = message;
+      pdfViewer.appendChild(winMsgDiv);
+    }
+
+    pdfjsLib.getDocument('Pasapalabras-Cientificas.pdf').promise.then(function (pdfDoc_) {
+      pdfDoc = pdfDoc_;
+      document.getElementById('page_count').textContent = pdfDoc.numPages;
+      renderPage(pageNum);
+    });
+  </script>
+</body>
+
+</html>
